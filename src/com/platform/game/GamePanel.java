@@ -94,7 +94,7 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     
     private void render() {
         
-        g.setColor(Color.black);
+        g.setColor(Color.cyan.darker().darker());
         g.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
         
         this.tilemap.draw(g);

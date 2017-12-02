@@ -4,6 +4,9 @@ package com.platform.game;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 /**
  * @name Player
@@ -39,10 +42,18 @@ public class Player {
     private boolean bottomLeft;
     private boolean bottomRight;
     
+    private Animation animation;
+    private BufferedImage[] idleSprites;
+    private BufferedImage[] walkingSprites;
+    private BufferedImage[] jumpingSprites;
+    private BufferedImage[] fallingSprites;
+    
+    private boolean faceLeft;
+    
     public Player(TileMap tileMap) {
         this.tileMap = tileMap;
-        this.width = 20;
-        this.height = 20;
+        this.width = 22;
+        this.height = 22;
         
         this.moveSpeed = 0.3;
         this.maxSpeed = 4.2;
@@ -50,6 +61,27 @@ public class Player {
         this.stopSpeed = 0.30;
         this.jumpStart = -11.0;
         this.gravity = 0.64;
+        this.idleSprites = new BufferedImage[1];
+        this.jumpingSprites = new BufferedImage[1];
+        this.fallingSprites = new BufferedImage[1];
+        this.walkingSprites = new BufferedImage[6];
+        
+        try {
+            this.idleSprites[0] = ImageIO.read(getClass().getResource("/com/platform/game/resources/kirbyidle.gif"));
+            this.jumpingSprites[0] = ImageIO.read(getClass().getResource("/com/platform/game/resources/kirbyjump.gif"));
+            this.fallingSprites[0] = ImageIO.read(getClass().getResource("/com/platform/game/resources/kirbyfall.gif"));
+            
+            BufferedImage img = ImageIO.read(getClass().getResource("/com/platform/game/resources/kirbywalk.gif"));
+            for (int i = 0; i < walkingSprites.length; i++) {
+                this.walkingSprites[i] = img.getSubimage(i * width + i, 0, width, height);
+            }
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        this.animation = new Animation();
+        this.faceLeft = false;
     }
     ////////////////////////////////////////////////////////////////////////////
     public void setLeft(boolean left) { this.left = left; }
@@ -68,14 +100,48 @@ public class Player {
         // move the map
         tileMap.setxOffset((int) (Game.WIDTH / 2 - this.x));
         tileMap.setyOffset((int) (Game.HEIGHT / 2 - this.y));
+        
+        if (left || right) {
+            animation.setFrames(walkingSprites);
+            animation.setDelay(100);
+        } else {
+            animation.setFrames(idleSprites);
+            animation.setDelay(-1);
+        }
+        
+        if (dy < 0) {
+            animation.setFrames(jumpingSprites);
+            animation.setDelay(-1);
+        } 
+        if (dy > 0 ) {
+            animation.setFrames(fallingSprites);
+            animation.setDelay(-1);
+        }
+        
+        if (dx > 0) {
+            this.faceLeft = false;
+        }
+        if (dx < 0) {
+            this.faceLeft = true;
+        }
+        animation.update();
     }
     
     public void draw(Graphics2D g) {
         int xOffset = tileMap.getxOffset();
         int yOffset = tileMap.getyOffset();
         
-        g.setColor(Color.red);
-        g.fillRect((int) (xOffset + x - width / 2), (int) (yOffset + y - height / 2), width, height);
+        if (this.faceLeft) {
+            g.drawImage(this.animation.getImage(), 
+                    (int) (xOffset + x - width / 2),
+                    (int) (yOffset + y - height / 2), null);
+        } else {
+            g.drawImage(this.animation.getImage(), 
+                    (int) (xOffset + x - width / 2 + width), 
+                    (int) (yOffset + y - height / 2),
+                    -width, height, null);
+        }
+        //g.fillRect((int) (xOffset + x - width / 2), (int) (yOffset + y - height / 2), width, height);
     }
     
     private void leftOrRight() {

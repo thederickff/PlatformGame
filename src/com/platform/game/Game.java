@@ -14,8 +14,8 @@ import javax.swing.JFrame;
  */
 public class Game {
 
-    public static final int WIDTH = 400;
-    public static final int HEIGHT = 400;
+    public static final int WIDTH = 450;
+    public static final int HEIGHT = 450;
 
     /**
      * @param args the command line arguments
