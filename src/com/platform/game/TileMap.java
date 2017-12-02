@@ -43,7 +43,16 @@ public class TileMap {
             System.out.printf("IOException error: %s\n", e);
         }
     }
-    
+    ////////////////////////////////////////////////////////////////////////////
+    public int getxOffset() { return xOffset; }
+    public int getyOffset() { return yOffset; } 
+    public int getColTile(int x) { return x / tileSize; }
+    public int getRowTile(int y) { return y / tileSize; }
+    public int getTileSize() { return tileSize; }
+    public int getTile(int row, int col) { return map[row][col]; }
+    public void setxOffset(int xOffset) { this.xOffset = xOffset; }
+    public void setyOffset(int yOffset) { this.yOffset = yOffset; }
+    ////////////////////////////////////////////////////////////////////////////
     public void update() {
         
     }
