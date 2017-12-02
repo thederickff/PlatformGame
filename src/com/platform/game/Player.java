@@ -190,9 +190,9 @@ public class Player {
         int topTile = this.tileMap.getRowTile((int) (y - height / 2));
         int bottomTile = this.tileMap.getRowTile((int) (y + height / 2) - 1);
         
-        this.topLeft = tileMap.getTile(topTile, leftTile) == 0;
-        this.topRight = tileMap.getTile(topTile, rightTile) == 0;
-        this.bottomLeft = tileMap.getTile(bottomTile, leftTile) == 0;
-        this.bottomRight = tileMap.getTile(bottomTile, rightTile) == 0;
+        this.topLeft = tileMap.isBlocked(topTile, leftTile);
+        this.topRight = tileMap.isBlocked(topTile, rightTile);
+        this.bottomLeft = tileMap.isBlocked(bottomTile, leftTile);
+        this.bottomRight = tileMap.isBlocked(bottomTile, rightTile);
     }
 }

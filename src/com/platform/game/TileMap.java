@@ -3,9 +3,11 @@ package com.platform.game;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import javax.imageio.ImageIO;
 
 /**
  * @name TileMap
@@ -21,6 +23,9 @@ public class TileMap {
     private int[][] map;
     private int mapWidth;
     private int mapHeight;
+    
+    private BufferedImage tileSet;
+    private Tile[][] tiles;
 
     public TileMap(String s, int tileSize) {
         this.tileSize = tileSize;
@@ -30,7 +35,7 @@ public class TileMap {
             mapHeight = Integer.parseInt(br.readLine());
             map = new int[mapHeight][mapWidth];
             
-            String delimiters = " ";
+            String delimiters = "\\s+";
             
             for (int row = 0; row < mapHeight; row++) {
                 String line = br.readLine();
@@ -43,6 +48,26 @@ public class TileMap {
             System.out.printf("IOException error: %s\n", e);
         }
     }
+    
+    public void loadTiles(String s) {
+        try {
+            this.tileSet = ImageIO.read(getClass().getResource(s));
+            int numberTilesAcross = (tileSet.getWidth() + 1) / (tileSize + 1);
+            
+            tiles = new Tile[2][numberTilesAcross];
+            
+            BufferedImage subImage;
+            
+            for (int col = 0; col < numberTilesAcross; col ++) {
+                subImage = tileSet.getSubimage(col * tileSize + col, 0, tileSize, tileSize);
+                tiles[0][col] = new Tile(subImage, false);
+                subImage = tileSet.getSubimage(col * tileSize + col, tileSize + 1, tileSize, tileSize);
+                tiles[1][col] = new Tile(subImage, true);
+            }
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
     ////////////////////////////////////////////////////////////////////////////
     public int getxOffset() { return xOffset; }
     public int getyOffset() { return yOffset; } 
@@ -50,6 +75,12 @@ public class TileMap {
     public int getRowTile(int y) { return y / tileSize; }
     public int getTileSize() { return tileSize; }
     public int getTile(int row, int col) { return map[row][col]; }
+    public boolean isBlocked(int row, int col) {
+        int rc = map[row][col];
+        int r = rc / tiles[0].length;
+        int c = rc % tiles[0].length;
+        return tiles[r][c].isBlocked();
+    }
     public void setxOffset(int xOffset) { this.xOffset = xOffset; }
     public void setyOffset(int yOffset) { this.yOffset = yOffset; }
     ////////////////////////////////////////////////////////////////////////////
@@ -62,13 +93,10 @@ public class TileMap {
             for (int col = 0; col < mapWidth; col++) {
                 int rc = map[row][col];
                 
-                if (rc == 0) {
-                    g.setColor(Color.black);
-                } else {
-                    g.setColor(Color.white);
-                }
+                int r = rc / tiles[0].length;
+                int c = rc % tiles[0].length;
                 
-                g.fillRect(xOffset + col * tileSize, yOffset + row * tileSize, tileSize, tileSize);
+                g.drawImage(tiles[r][c].getImage(), xOffset + col * tileSize, yOffset + row * tileSize, null);
             }
         }
     }

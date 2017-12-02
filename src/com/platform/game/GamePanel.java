@@ -1,6 +1,7 @@
 /* Copyright (c) 2017, Derick Felix */
 package com.platform.game;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
@@ -77,7 +78,8 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
         this.running = true;
         this.image = new BufferedImage(Game.WIDTH, Game.HEIGHT, BufferedImage.TYPE_INT_RGB);
         g = (Graphics2D) image.getGraphics();
-        this.tilemap = new TileMap(getClass().getResource("/com/platform/game/resources/map.txt").getFile(), 32);
+        this.tilemap = new TileMap(getClass().getResource("/com/platform/game/resources/map2.txt").getFile(), 32);
+        tilemap.loadTiles("/com/platform/game/resources/tileset.gif");
         this.player = new Player(tilemap);
         this.player.setX(50);
         this.player.setY(50);
@@ -91,6 +93,10 @@ public class GamePanel extends JPanel implements Runnable, KeyListener {
     }
     
     private void render() {
+        
+        g.setColor(Color.black);
+        g.fillRect(0, 0, Game.WIDTH, Game.HEIGHT);
+        
         this.tilemap.draw(g);
         this.player.draw(g);
     }
